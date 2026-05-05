@@ -1,0 +1,74 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+int main() {
+    
+    const int MAX_STUDENTS = 5;
+    const int MAX_SUBJECTS = 4;
+
+    string names[MAX_STUDENTS];
+    int grades[MAX_STUDENTS][MAX_SUBJECTS];
+    double averages[MAX_STUDENTS];
+    
+    int numStudents, numSubjects;
+
+   
+    cout << "Enter number of students (maximum 5): ";
+    cin >> numStudents;
+    if (numStudents > MAX_STUDENTS) numStudents = MAX_STUDENTS;
+
+    cout << "Enter number of subjects (maximum 4): ";
+    cin >> numSubjects;
+    if (numSubjects > MAX_SUBJECTS) numSubjects = MAX_SUBJECTS;
+
+    cout << endl;
+
+    
+    for (int i = 0; i < numStudents; i++) {
+        cout << "Student " << i + 1 << " Name: ";
+        cin.ignore();
+        getline(cin, names[i]);
+
+        int totalForStudent = 0;
+        for (int j = 0; j < numSubjects; j++) {
+            cout << "  Subject " << j + 1 << " Grade: ";
+            cin >> grades[i][j];
+            totalForStudent += grades[i][j];
+        }
+        averages[i] = static_cast<double>(totalForStudent) / numSubjects;
+        cout << endl;
+    }
+
+   
+    cout << "\n--- Student Grade Report ---\n";
+    cout << left << setw(15) << "Name" << "Grades" << setw(15) << right << "Total" << setw(10) << "Average" << endl;
+    
+    double maxAverage = -1.0;
+    string topStudent = "";
+
+    for (int i = 0; i < numStudents; i++) {
+        cout << left << setw(15) << names[i];
+        
+        int rowTotal = 0;
+        for (int j = 0; j < numSubjects; j++) {
+            cout << grades[i][j] << " ";
+            rowTotal += grades[i][j];
+        }
+
+        cout << right << setw(10) << rowTotal << setw(10) << fixed << setprecision(2) << averages[i] << endl;
+
+        
+        if (averages[i] > maxAverage) {
+            maxAverage = averages[i];
+            topStudent = names[i];
+        }
+    }
+
+    cout << "\n-----------------------------------" << endl;
+    cout << "Highest Average Student: " << topStudent << " (" << maxAverage << ")" << endl;
+
+    return 0;
+}
