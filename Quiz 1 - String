@@ -1,0 +1,32 @@
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+int main() {
+   
+    char defaultUser[] = "Jm1999";
+    char defaultPass[] = "Macbaptista30";
+
+   
+    char inputUser[50];
+    char inputPass[50];
+
+   
+    cout << "Enter Username: ";
+    cin >> inputUser;
+
+    cout << "Enter Password: ";
+    cin >> inputPass;
+
+    cout << endl; 
+
+    
+    if (strcmp(inputUser, defaultUser) == 0 && strcmp(inputPass, defaultPass) == 0) {
+        cout << "Access Granted" << endl;
+    } else {
+        cout << "Invalid Username or Password" << endl;
+    }
+
+    return 0;
+}
