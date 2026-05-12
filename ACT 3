@@ -1,0 +1,43 @@
+#include <iostream>
+#include <cstring> 
+
+using namespace std;
+
+int main() {
+   
+    char firstName[50];
+    char lastName[50];
+    char course[50];
+    char completeName[100]; 
+    char tempCopy[50];      
+
+   
+    cout << "Enter First Name: ";
+    cin.getline(firstName, 50);
+
+    cout << "Enter Last Name: ";
+    cin.getline(lastName, 50);
+
+    cout << "Enter Course: ";
+    cin.getline(course, 50);
+
+   
+    strcpy(tempCopy, firstName);
+
+    
+    strcpy(completeName, firstName);
+    
+    strcat(completeName, " ");
+   
+    strcat(completeName, lastName);
+
+    
+    cout << "\nComplete Name: " << completeName << endl;
+    cout << "Course: " << course << endl;
+
+   
+    int nameLength = strlen(completeName);
+    cout << "Length of Complete Name: " << nameLength << endl;
+
+    return 0;
+}
