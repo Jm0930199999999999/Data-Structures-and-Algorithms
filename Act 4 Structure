@@ -1,0 +1,81 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+
+using namespace std;
+
+
+struct Student {
+    string id;
+    string name;
+    string course;
+    double midtermGrade;
+    double finalGrade;
+    double average;
+    string remarks;
+};
+
+
+void displayRecords(const Student students[], int size) {
+    cout << "\n=======================================================\n";
+    cout << "                    STUDENT RECORDS                    \n";
+    cout << "=======================================================\n";
+    
+    for (int i = 0; i < size; i++) {
+        cout << "Student #" << (i + 1) << endl;
+        cout << "-------------------------------------------------------\n";
+        cout << "ID:      " << students[i].id << endl;
+        cout << "Name:    " << students[i].name << endl;
+        cout << "Course:  " << students[i].course << endl;
+        cout << "Midterm: " << fixed << setprecision(2) << students[i].midtermGrade << endl;
+        cout << "Final:   " << students[i].finalGrade << endl;
+        cout << "Average: " << students[i].average << endl;
+        cout << "Remarks: " << students[i].remarks << endl;
+        cout << "-------------------------------------------------------\n";
+    }
+}
+
+int main() {
+    const int MAX_STUDENTS = 5;
+    
+   
+    Student students[MAX_STUDENTS];
+
+    cout << "Please enter information for " << MAX_STUDENTS << " students:\n";
+
+    
+    for (int i = 0; i < MAX_STUDENTS; i++) {
+        cout << "\nEntering details for Student " << (i + 1) << ":\n";
+        
+        
+        cout << "Enter Student ID: ";
+        getline(cin >> ws, students[i].id); 
+        
+        cout << "Enter Full Name: ";
+        getline(cin, students[i].name);
+        
+        cout << "Enter Course: ";
+        getline(cin, students[i].course);
+        
+        cout << "Enter Midterm Grade: ";
+        cin >> students[i].midtermGrade;
+        
+        cout << "Enter Final Grade: ";
+        cin >> students[i].finalGrade;
+
+        
+        students[i].average = (students[i].midtermGrade + students[i].finalGrade) / 2.0;
+
+        
+        if (students[i].average >= 75) {
+            students[i].remarks = "PASSED";
+        } else {
+            students[i].remarks = "FAILED";
+        }
+    }
+
+    
+    displayRecords(students, MAX_STUDENTS);
+
+    return 0;
+}
