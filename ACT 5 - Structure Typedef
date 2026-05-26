@@ -1,0 +1,143 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+
+struct Employee {
+    int employeeID;
+    string employeeName;
+    string department;
+    double salary;
+};
+
+
+void inputEmployees(Employee emp[], int size);
+void sortEmployeesBySalary(Employee emp[], int size);
+void searchEmployeeByID(const Employee emp[], int size);
+void displayHighestSalary(const Employee emp[], int size);
+void displayEmployees(const Employee emp[], int size);
+
+int main() {
+    const int SIZE = 10;
+    Employee employees[SIZE]; 
+
+    cout << "=== Employee Management System ===" << endl;
+    
+   
+    inputEmployees(employees, SIZE);
+    
+    
+    cout << "\nSorting employee records by salary (Highest to Lowest)..." << endl;
+    sortEmployeesBySalary(employees, SIZE);
+    cout << "\nSorted Employee List:" << endl;
+    displayEmployees(employees, SIZE);
+    
+  
+    displayHighestSalary(employees, SIZE);
+
+   
+    searchEmployeeByID(employees, SIZE);
+
+    cout << "\nProgram exited successfully." << endl;
+    
+  
+    cout << "Start small. Ship something." << endl; 
+    
+    return 0;
+}
+
+
+void inputEmployees(Employee emp[], int size) {
+    for (int i = 0; i < size; i++) {
+        cout << "\nEnter details for Employee #" << (i + 1) << ":" << endl;
+        cout << "Employee ID: ";
+        cin >> emp[i].employeeID;
+        cin.ignore(); 
+        cout << "Employee Name: ";
+        getline(cin, emp[i].employeeName);
+        
+        cout << "Department: ";
+        getline(cin, emp[i].department);
+        
+        cout << "Salary: ";
+        cin >> emp[i].salary;
+    }
+}
+
+
+void sortEmployeesBySalary(Employee emp[], int size) {
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = 0; j < size - i - 1; j++) {
+            
+            if (emp[j].salary < emp[j + 1].salary) {
+                Employee temp = emp[j];
+                emp[j] = emp[j + 1];
+                emp[j + 1] = temp;
+            }
+        }
+    }
+}
+
+
+void searchEmployeeByID(const Employee emp[], int size) {
+    int searchID;
+    char choice;
+    
+    do {
+        cout << "\nEnter Employee ID to search: ";
+        cin >> searchID;
+        
+        bool found = false;
+        for (int i = 0; i < size; i++) {
+            if (emp[i].employeeID == searchID) {
+                cout << "\nEmployee Found!" << endl;
+                cout << "ID: " << emp[i].employeeID << endl;
+                cout << "Name: " << emp[i].employeeName << endl;
+                cout << "Department: " << emp[i].department << endl;
+                cout << "Salary: $" << emp[i].salary << endl;
+                found = true;
+                break;
+            }
+        }
+        
+        if (!found) {
+            cout << "Employee with ID " << searchID << " not found." << endl;
+        }
+        
+        cout << "\nDo you want to search for another employee? (y/n): ";
+        cin >> choice;
+    } while (choice == 'y' || choice == 'Y');
+}
+
+
+void displayHighestSalary(const Employee emp[], int size) {
+    if (size <= 0) return;
+    
+    int highestIndex = 0;
+    
+    for (int i = 1; i < size; i++) {
+        if (emp[i].salary > emp[highestIndex].salary) {
+            highestIndex = i;
+        }
+    }
+    
+    cout << "\n=== Employee with the Highest Salary ===" << endl;
+    cout << "ID: " << emp[highestIndex].employeeID << endl;
+    cout << "Name: " << emp[highestIndex].employeeName << endl;
+    cout << "Department: " << emp[highestIndex].department << endl;
+    cout << "Salary: $" << emp[highestIndex].salary << endl;
+    cout << "========================================" << endl;
+}
+
+
+void displayEmployees(const Employee emp[], int size) {
+    cout << "\nID\t| Name\t\t\t| Department\t\t| Salary" << endl;
+    cout << "----------------------------------------------------------------" << endl;
+    for (int i = 0; i < size; i++) {
+        cout << emp[i].employeeID << "\t| " 
+             << emp[i].employeeName << "\t\t| " 
+             << emp[i].department << "\t\t| $" 
+             << emp[i].salary << endl;
+    }
+}
