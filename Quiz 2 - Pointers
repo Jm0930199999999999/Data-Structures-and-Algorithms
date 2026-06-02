@@ -1,0 +1,140 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+
+struct Employee {
+    int empID;
+    char name[50];
+    char department[30];
+    float basicSalary;
+    float overtimeHours;
+    float overtimePay;
+    float grossSalary;
+    float tax;
+    float netSalary;
+};
+
+
+void inputEmployee(Employee *emp, int size);
+void computePayroll(Employee *emp, int size);
+void displayEmployee(Employee *emp, int size);
+void searchEmployee(Employee *emp, int size);
+void highestSalary(Employee *emp, int size);
+
+int main() {
+    const int SIZE = 10;
+    Employee employees[SIZE];
+
+    
+    inputEmployee(employees, SIZE);
+    computePayroll(employees, SIZE);
+    displayEmployee(employees, SIZE);
+    searchEmployee(employees, SIZE);
+    highestSalary(employees, SIZE);
+
+    return 0;
+}
+
+// Function 1: Input employee records
+void inputEmployee(Employee *emp, int size) {
+    for (int i = 0; i < size; i++) {
+        cout << "EMPLOYEE #" << (i + 1) << "\n";
+        cout << "ID: ";
+        cin >> (emp + i)->empID;
+        cin.ignore(); 
+
+        cout << "Name: ";
+        cin.getline((emp + i)->name, 50);
+
+        cout << "Department: ";
+        cin.getline((emp + i)->department, 30);
+
+        cout << "Basic Salary: ";
+        cin >> (emp + i)->basicSalary;
+
+        cout << "Overtime Hours: ";
+        cin >> (emp + i)->overtimeHours;
+        cout << "\n-----------------------------------\n";
+    }
+}
+
+// Function 2: Calculate payroll using pointers
+void computePayroll(Employee *emp, int size) {
+    for (int i = 0; i < size; i++) {
+        
+        (emp + i)->overtimePay = (emp + i)->overtimeHours * 200;
+
+        
+        (emp + i)->grossSalary = (emp + i)->basicSalary + (emp + i)->overtimePay;
+
+        
+        (emp + i)->tax = (emp + i)->grossSalary * 0.10f;
+
+        
+        (emp + i)->netSalary = (emp + i)->grossSalary - (emp + i)->tax;
+    }
+}
+
+// Function 3: Display all employee records
+void displayEmployee(Employee *emp, int size) {
+    cout << "\n===================================\n";
+    cout << "EMPLOYEE PAYROLL REPORT\n";
+    cout << "===================================\n";
+
+    for (int i = 0; i < size; i++) {
+        cout << "ID: " << (emp + i)->empID << "\n";
+        cout << "Name: " << (emp + i)->name << "\n";
+        cout << "Department: " << (emp + i)->department << "\n\n";
+        cout << "Basic Salary: " << (emp + i)->basicSalary << "\n";
+        cout << "Overtime Pay: " << (emp + i)->overtimePay << "\n";
+        cout << "Gross Salary: " << (emp + i)->grossSalary << "\n";
+        cout << "Tax: " << (emp + i)->tax << "\n";
+        cout << "Net Salary: " << (emp + i)->netSalary << "\n";
+        cout << "-----------------------------------\n";
+    }
+}
+
+// Function 4: Search employee by Employee ID
+void searchEmployee(Employee *emp, int size) {
+    int searchID;
+    bool found = false;
+
+    cout << "\nEnter Employee ID to Search: ";
+    cin >> searchID;
+
+    for (int i = 0; i < size; i++) {
+        if ((emp + i)->empID == searchID) {
+            cout << "\nRECORD FOUND\n\n";
+            cout << "Name: " << (emp + i)->name << "\n";
+            cout << "Net Salary: " << (emp + i)->netSalary << "\n";
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "\nRECORD NOT FOUND\n";
+    }
+    cout << "-----------------------------------\n";
+}
+
+// Function 5: Display highest paid employee based on Net Salary
+void highestSalary(Employee *emp, int size) {
+    if (size <= 0) return;
+
+    Employee *highest = emp; 
+
+    for (int i = 1; i < size; i++) {
+        if ((emp + i)->netSalary > highest->netSalary) {
+            highest = (emp + i);
+        }
+    }
+
+    cout << "\nHIGHEST PAID EMPLOYEE\n\n";
+    cout << "ID: " << highest->empID << "\n";
+    cout << "Name: " << highest->name << "\n";
+    cout << "Net Salary: " << highest->netSalary << "\n";
+    cout << "-----------------------------------\n";
+}
