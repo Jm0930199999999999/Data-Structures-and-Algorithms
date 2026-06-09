@@ -1,0 +1,173 @@
+#include <iostream>
+#include <iomanip>
+#include <cstring>
+
+using namespace std;
+
+
+struct Student {
+    int studentID;
+    char name[50];
+    char course[30];
+    float midtermGrade;
+    float finalGrade;
+    float computedAverage;
+    char academicStatus[20]; 
+    float scholarshipGrant;  
+};
+
+
+void inputStudents(Student *stud, int size);
+void computePerformance(Student *stud, int size);
+void displayReport(Student *stud, int size);
+void searchStudent(Student *stud, int size);
+void displayTopStudent(Student *stud, int size);
+
+int main() {
+    const int SIZE = 10;
+    Student students[SIZE];
+    
+   
+    inputStudents(students, SIZE);
+    computePerformance(students, SIZE);
+    displayReport(students, SIZE);
+    searchStudent(students, SIZE);
+    displayTopStudent(students, SIZE);
+    
+    return 0;
+}
+
+// Function 1: Input Records
+void inputStudents(Student *stud, int size) {
+    cout << "=====================================================" << endl;
+    cout << "             ENTER STUDENT RECORD DETAILS            " << endl;
+    cout << "=====================================================" << endl;
+    
+    for (int i = 0; i < size; i++) {
+        cout << "STUDENT #" << (i + 1) << endl;
+        
+        cout << "ID: ";
+        cin >> (stud + i)->studentID;
+        cin.ignore(); 
+        
+        cout << "Name: ";
+        cin.getline((stud + i)->name, 50);
+        
+        cout << "Course: ";
+        cin.getline((stud + i)->course, 30);
+        
+        cout << "Midterm Grade: ";
+        cin >> (stud + i)->midtermGrade;
+        
+        cout << "Final Grade: ";
+        cin >> (stud + i)->finalGrade;
+        cout << endl;
+    }
+}
+
+// Function 2: Compute Academic Performance
+void computePerformance(Student *stud, int size) {
+    for (int i = 0; i < size; i++) {
+        
+        (stud + i)->computedAverage = ((stud + i)->midtermGrade * 0.40f) + ((stud + i)->finalGrade * 0.60f);
+        
+        
+        if ((stud + i)->computedAverage >= 75.0f) {
+            strcpy((stud + i)->academicStatus, "Passed");
+        } else {
+            strcpy((stud + i)->academicStatus, "Failed");
+        }
+        
+        
+        if ((stud + i)->computedAverage >= 92.0f) {
+            (stud + i)->scholarshipGrant = 15000.00f;
+        } else if ((stud + i)->computedAverage >= 85.0f) {
+            (stud + i)->scholarshipGrant = 7500.00f;
+        } else {
+            (stud + i)->scholarshipGrant = 0.00f;
+        }
+    }
+}
+
+// Function 3: Display Performance Report
+void displayReport(Student *stud, int size) {
+    cout << "==========================================================================================" << endl;
+    cout << "                                  STUDENT ACADEMIC REPORT                                 " << endl;
+    cout << "==========================================================================================" << endl;
+    
+   
+    cout << left << setw(10) << "ID" 
+         << setw(15) << "NAME" 
+         << setw(18) << "COURSE" 
+         << right << setw(8) << "MIDTERM" 
+         << setw(8) << "FINAL" 
+         << setw(10) << "AVERAGE" 
+         << setw(10) << "STATUS" 
+         << setw(11) << "GRANT" << endl;
+         
+    cout << fixed << setprecision(2);
+    
+    for (int i = 0; i < size; i++) {
+        cout << left << setw(10) << (stud + i)->studentID 
+             << setw(15) << (stud + i)->name 
+             << setw(18) << (stud + i)->course 
+             << right << setw(8) << (stud + i)->midtermGrade 
+             << setw(8) << (stud + i)->finalGrade 
+             << setw(10) << (stud + i)->computedAverage 
+             << setw(10) << (stud + i)->academicStatus 
+             << setw(11) << (stud + i)->scholarshipGrant << endl;
+    }
+    cout << "==========================================================================================" << endl;
+    cout << endl;
+}
+
+
+void searchStudent(Student *stud, int size) {
+    int targetID;
+    bool found = false;
+    
+    cout << "Enter Student ID to Search: ";
+    cin >> targetID;
+    cout << "-----------------------------------------------------" << endl;
+    
+    for (int i = 0; i < size; i++) {
+        if ((stud + i)->studentID == targetID) {
+            cout << "Record Found!" << endl;
+            cout << "Name: " << (stud + i)->name << endl;
+            cout << "Course: " << (stud + i)->course << endl;
+            cout << fixed << setprecision(2);
+            cout << "Computed Average: " << (stud + i)->computedAverage << endl;
+            cout << "Academic Status: " << (stud + i)->academicStatus << endl;
+            found = true;
+            break; 
+        }
+    }
+    
+    if (!found) {
+        cout << "Record Not Found." << endl;
+    }
+    cout << "-----------------------------------------------------" << endl;
+    cout << endl;
+}
+
+
+void displayTopStudent(Student *stud, int size) {
+    Student *topStudent = stud; 
+    
+    for (int i = 1; i < size; i++) {
+        if ((stud + i)->computedAverage > topStudent->computedAverage) {
+            topStudent = (stud + i);
+        }
+    }
+    
+    cout << "=====================================================" << endl;
+    cout << "                 TOP ACADEMIC PERFORMER              " << endl;
+    cout << "=====================================================" << endl;
+    cout << "ID: " << topStudent->studentID << endl;
+    cout << "Name: " << topStudent->name << endl;
+    cout << "Course: " << topStudent->course << endl;
+    cout << fixed << setprecision(2);
+    cout << "Highest Average: " << topStudent->computedAverage << endl;
+    cout << "Scholarship Awarded: Php " << topStudent->scholarshipGrant << endl;
+    cout << "=====================================================" << endl;
+}
