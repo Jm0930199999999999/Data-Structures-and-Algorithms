@@ -1,0 +1,144 @@
+#include <iostream>
+#include <string>
+#include <cstring>
+
+using namespace std;
+
+#define MAX 5
+
+
+struct Ticket {
+    int ticketID;
+    char customerName[50];
+    char issueDescription[100];
+};
+
+
+Ticket ticketQueue[MAX];
+int front = 0;
+int rear = -1;
+int itemCount = 0;
+
+
+bool isFull() {
+    return itemCount == MAX;
+}
+
+
+bool isEmpty() {
+    return itemCount == 0;
+}
+
+
+void enqueue() {
+    if (isFull()) {
+        cout << "\nQueue Overflow! Cannot add more tickets. Maximum capacity reached.\n";
+        return;
+    }
+
+    Ticket newTicket;
+    cout << "\n[Executing Enqueue...]\n";
+    cout << "Enter Ticket ID : ";
+    cin >> newTicket.ticketID;
+    cin.ignore(); 
+
+    cout << "Enter Customer Name: ";
+    cin.getline(newTicket.customerName, 50);
+
+    cout << "Enter Issue Brief : ";
+    cin.getline(newTicket.issueDescription, 100);
+
+  
+    rear = (rear + 1) % MAX;
+    ticketQueue[rear] = newTicket;
+    itemCount++;
+}
+
+
+void dequeue() {
+    if (isEmpty()) {
+        cout << "\nQueue Underflow! No active tickets to process.\n";
+        return;
+    }
+
+    cout << "\n[Executing Dequeue...]\n";
+    cout << "---------------------------------------------\n";
+    Ticket activeTicket = ticketQueue[front];
+    cout << "Serving Ticket ID #" << activeTicket.ticketID << " (" << activeTicket.customerName << ")\n";
+    cout << "Issue Clarified: " << activeTicket.issueDescription << "\n";
+    cout << "Ticket removed from active processing pipeline.\n";
+    cout << "---------------------------------------------\n";
+
+  
+    front = (front + 1) % MAX;
+    itemCount--;
+}
+
+
+void peek() {
+    if (isEmpty()) {
+        cout << "\nNo records found. The queue is currently empty.\n";
+        return;
+    }
+
+    cout << "\n[Peeking Front Record...]\n";
+    cout << "---------------------------------------------\n";
+    cout << "Ticket at Front:\n";
+    cout << "ID  : " << ticketQueue[front].ticketID << "\n";
+    cout << "Name : " << ticketQueue[front].customerName << "\n";
+    cout << "Issue: " << ticketQueue[front].issueDescription << "\n";
+    cout << "---------------------------------------------\n";
+}
+
+
+void checkStatus() {
+    cout << "\n--- Queue Status Check ---\n";
+    cout << "Current Pending Tickets: " << itemCount << " / " << MAX << "\n";
+    if (isFull()) {
+        cout << "Status: FULL\n";
+    } else if (isEmpty()) {
+        cout << "Status: EMPTY\n";
+    } else {
+        cout << "Status: OPERATIONAL\n";
+    }
+}
+
+int main() {
+    int choice;
+
+    do {
+        cout << "\n=============================================\n";
+        cout << "       CUSTOMER TICKET MANAGEMENT HOTLINE    \n";
+        cout << "=============================================\n";
+        cout << "1. Enqueue New Ticket (Add to Queue)\n";
+        cout << "2. Dequeue Ticket (Serve Customer)\n";
+        cout << "3. Peek Front Ticket\n";
+        cout << "4. Check Queue Status\n";
+        cout << "5. Exit System\n";
+        cout << "=============================================\n";
+        cout << "Select an Option: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                enqueue();
+                break;
+            case 2:
+                dequeue();
+                break;
+            case 3:
+                peek();
+                break;
+            case 4:
+                checkStatus();
+                break;
+            case 5:
+                cout << "\nExiting System. Goodbye!\n";
+                break;
+            default:
+                cout << "\nInvalid choice! Please select an option from 1 to 5.\n";
+        }
+    } while (choice != 5);
+
+    return 0;
+}
