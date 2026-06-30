@@ -1,0 +1,141 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+
+struct InventoryBatch {
+    int batchID;
+    char supplierName[50];
+    int itemQuantity;
+    char dateReceived[12]; 
+};
+
+
+InventoryBatch storageBay[5];
+int top = -1;
+
+
+bool isEmpty() {
+    return top == -1;
+}
+
+
+bool isFull() {
+    return top == 4;
+}
+
+
+void push() {
+    if (isFull()) {
+        cout << "\n[Error] Warehouse capacity exceeded! Cannot stack more batches.\n";
+        return;
+    }
+    
+    top++;
+    cout << "\n[Executing Cargo Receiving Protocol (Push)...]\n";
+    cout << "Enter Batch ID  : ";
+    cin >> storageBay[top].batchID;
+    cin.ignore(); 
+    
+    cout << "Enter Supplier Name : ";
+    cin.getline(storageBay[top].supplierName, 50);
+    
+    cout << "Enter Item Quantity : ";
+    cin >> storageBay[top].itemQuantity;
+    cin.ignore();
+    
+    cout << "Enter Receiving Date : ";
+    cin.getline(storageBay[top].dateReceived, 12);
+    
+    cout << "Batch " << storageBay[top].batchID << " successfully stacked into storage bay.\n";
+}
+
+
+void pop() {
+    if (isEmpty()) {
+        cout << "\n[Error] Storage bay is empty! No batches available to dispatch.\n";
+        return;
+    }
+    
+    cout << "\n[Executing Dispatch Protocol (Pop)...]\n";
+    cout << "---------------------------------------------\n";
+    cout << "Dispatching Batch ID #" << storageBay[top].batchID << " from top of stack.\n";
+    cout << "Supplier Source : " << storageBay[top].supplierName << "\n";
+    cout << "Items Transferred : " << storageBay[top].itemQuantity << " units\n";
+    cout << "Crate moved cleanly to factory production floor.\n";
+    cout << "---------------------------------------------\n";
+    
+    top--;
+}
+
+
+void peek() {
+    if (isEmpty()) {
+        cout << "\n[Error] Storage bay is empty! Nothing to preview at the top.\n";
+        return;
+    }
+    
+    cout << "\n[Inspecting Top Crate (Peek)...]\n";
+    cout << "---------------------------------------------\n";
+    cout << "Crate Sitting at Top of Stack:\n";
+    cout << "Batch ID  : " << storageBay[top].batchID << "\n";
+    cout << "Supplier  : " << storageBay[top].supplierName << "\n";
+    cout << "Quantity  : " << storageBay[top].itemQuantity << " units\n";
+    cout << "Date Logged : " << storageBay[top].dateReceived << "\n";
+}
+
+
+void checkDiagnostics() {
+    cout << "\n[Storage Bay Diagnostics]\n";
+    cout << "Current Occupancy: " << (top + 1) << " / 5 slots\n";
+    cout << "Status: " << (isFull() ? "FULL" : (isEmpty() ? "EMPTY" : "AVAILABLE")) << "\n";
+}
+
+int main() {
+    int choice;
+    
+    do {
+        cout << "\n=============================================\n";
+        cout << "     WAREHOUSE LIFO INVENTORY TRACKING SYSTEM\n";
+        cout << "=============================================\n";
+        cout << "1. Push Batch (Receive Incoming Cargo Crate)\n";
+        cout << "2. Pop Batch (Dispatch Top Crate to Production)\n";
+        cout << "3. Peek Top Batch (Inspect Current Top Cargo)\n";
+        cout << "4. Check Storage Bay Diagnostics\n";
+        cout << "5. Exit System Terminal\n";
+        cout << "=============================================\n";
+        cout << "Select an Option: ";
+        
+        if (!(cin >> choice)) {
+            
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input. Please enter a valid number (1-5).\n";
+            continue;
+        }
+        
+        switch (choice) {
+            case 1:
+                push();
+                break;
+            case 2:
+                pop();
+                break;
+            case 3:
+                peek();
+                break;
+            case 4:
+                checkDiagnostics();
+                break;
+            case 5:
+                cout << "\nShutting down terminal. Goodbye!\n";
+                break;
+            default:
+                cout << "\nInvalid choice! Please select an option between 1 and 5.\n";
+        }
+        
+    } while (choice != 5);
+    
+    return 0;
+}
