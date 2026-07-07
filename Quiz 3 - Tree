@@ -1,0 +1,406 @@
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+#include <vector>
+#include <queue>
+#include <string>
+
+using namespace std;
+
+
+const int ARRAY_SIZE = 10;
+
+// =================================================================
+// 1. STRUCTURE DEFINITIONS FOR TREE VARIATIONS
+// =================================================================
+
+
+struct BinaryNode {
+    int data;
+    int height; 
+    BinaryNode* left;
+    BinaryNode* right;
+
+    BinaryNode(int val) : data(val), height(1), left(nullptr), right(nullptr) {}
+};
+
+
+struct GeneralNode {
+    int data;
+    vector<GeneralNode*> children; 
+
+    GeneralNode(int val) : data(val) {}
+};
+
+
+struct TrieNode {
+    bool isEndOfValue;
+    TrieNode* children[10]; 
+
+    TrieNode() {
+        isEndOfValue = false;
+        for (int i = 0; i < 10; i++) children[i] = nullptr;
+    }
+};
+
+// =================================================================
+// 2. HELPER UTILITIES & TRANSFORMS
+// =================================================================
+
+
+void freeBinaryTree(BinaryNode* root) {
+    if (!root) return;
+    freeBinaryTree(root->left);
+    freeBinaryTree(root->right);
+    delete root;
+}
+
+void freeGeneralTree(GeneralNode* root) {
+    if (!root) return;
+    for (GeneralNode* child : root->children) {
+        freeGeneralTree(child);
+    }
+    delete root;
+}
+
+void freeTrie(TrieNode* root) {
+    if (!root) return;
+    for (int i = 0; i < 10; i++) {
+        if (root->children[i]) freeTrie(root->children[i]);
+    }
+    delete root;
+}
+
+
+void printInOrder(BinaryNode* root) {
+    if (!root) return;
+    printInOrder(root->left);
+    cout << root->data << " ";
+    printInOrder(root->right);
+}
+
+
+void printLevelOrder(BinaryNode* root) {
+    if (!root) {
+        cout << "(Tree is empty)\n";
+        return;
+    }
+    queue<BinaryNode*> q;
+    q.push(root);
+    while (!q.empty()) {
+        BinaryNode* current = q.front();
+        q.pop();
+        cout << current->data << " ";
+        if (current->left) q.push(current->left);
+        if (current->right) q.push(current->right);
+    }
+    cout << "\n";
+}
+
+// =================================================================
+// 3. ARCHITECTURAL TREE BUILDERS
+// =================================================================
+
+
+GeneralNode* buildGeneralTree(const int arr[]) {
+    GeneralNode* root = new GeneralNode(arr[0]);
+   
+    root->children.push_back(new GeneralNode(arr[1]));
+    root->children.push_back(new GeneralNode(arr[2]));
+    root->children.push_back(new GeneralNode(arr[3]));
+
+    
+    root->children[0]->children.push_back(new GeneralNode(arr[4]));
+    root->children[0]->children.push_back(new GeneralNode(arr[5]));
+
+    root->children[1]->children.push_back(new GeneralNode(arr[6]));
+
+    root->children[2]->children.push_back(new GeneralNode(arr[7]));
+    root->children[2]->children.push_back(new GeneralNode(arr[8]));
+    root->children[2]->children.push_back(new GeneralNode(arr[9]));
+    return root;
+}
+
+void printGeneralTreeBFS(GeneralNode* root) {
+    if (!root) return;
+    queue<GeneralNode*> q;
+    q.push(root);
+    while (!q.empty()) {
+        GeneralNode* current = q.front();
+        q.pop();
+        cout << current->data << " -> [Children Data: ";
+        for (GeneralNode* child : current->children) {
+            cout << child->data << " ";
+            q.push(child);
+        }
+        cout << "]\n";
+    }
+}
+
+
+BinaryNode* buildStandardBinaryTree(const int arr[], int i, int n) {
+    BinaryNode* root = nullptr;
+    if (i < n) {
+        root = new BinaryNode(arr[i]);
+        root->left = buildStandardBinaryTree(arr, 2 * i + 1, n);
+        root->right = buildStandardBinaryTree(arr, 2 * i + 2, n);
+    }
+    return root;
+}
+
+
+BinaryNode* insertBST(BinaryNode* root, int value) {
+    if (!root) return new BinaryNode(value);
+    if (value < root->data) {
+        root->left = insertBST(root->left, value);
+    } else {
+        root->right = insertBST(root->right, value);
+    }
+    return root;
+}
+
+
+int getHeight(BinaryNode* n) { return n ? n->height : 0; }
+int getBalanceFactor(BinaryNode* n) { return n ? getHeight(n->left) - getHeight(n->right) : 0; }
+
+BinaryNode* rotateRight(BinaryNode* y) {
+    BinaryNode* x = y->left;
+    BinaryNode* T2 = x->right;
+    x->right = y;
+    y->left = T2;
+    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+    return x;
+}
+
+BinaryNode* rotateLeft(BinaryNode* x) {
+    BinaryNode* y = x->right;
+    BinaryNode* T2 = y->left;
+    y->left = x;
+    x->right = T2;
+    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+    return y;
+}
+
+BinaryNode* insertAVL(BinaryNode* node, int value) {
+    if (!node) return new BinaryNode(value);
+
+    if (value < node->data) node->left = insertAVL(node->left, value);
+    else if (value > node->data) node->right = insertAVL(node->right, value);
+    else return node; // Prevent duplicate keys from altering tree topology
+
+    node->height = 1 + max(getHeight(node->left), getHeight(node->right));
+    int balance = getBalanceFactor(node);
+
+   
+    if (balance > 1 && value < node->left->data) return rotateRight(node);
+   
+    if (balance < -1 && value > node->right->data) return rotateLeft(node);
+    
+    if (balance > 1 && value > node->left->data) {
+        node->left = rotateLeft(node->left);
+        return rotateRight(node);
+    }
+   
+    if (balance < -1 && value < node->right->data) {
+        node->right = rotateRight(node->right);
+        return rotateLeft(node);
+    }
+    return node;
+}
+
+
+void heapify(int arr[], int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest]) largest = left;
+    if (right < n && arr[right] > arr[largest]) largest = right;
+
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        heapify(arr, n, largest);
+    }
+}
+
+
+BinaryNode* buildFullBinaryTree(const int arr[]) {
+    
+    int temp[7];
+    for (int i = 0; i < 7; i++) temp[i] = arr[i];
+    sort(temp, temp + 7);
+
+    BinaryNode* root = new BinaryNode(temp[3]);
+    root->left = new BinaryNode(temp[1]);
+    root->right = new BinaryNode(temp[5]);
+
+    root->left->left = new BinaryNode(temp[0]);
+    root->left->right = new BinaryNode(temp[2]);
+
+    root->right->left = new BinaryNode(temp[4]);
+    root->right->right = new BinaryNode(temp[6]);
+    return root;
+}
+
+
+BinaryNode* buildPerfectBinaryTree(const int arr[]) {
+  
+    BinaryNode* root = new BinaryNode(arr[0]);
+    root->left = new BinaryNode(arr[1]);
+    root->right = new BinaryNode(arr[2]);
+    root->left->left = new BinaryNode(arr[3]);
+    root->left->right = new BinaryNode(arr[4]);
+    root->right->left = new BinaryNode(arr[5]);
+    root->right->right = new BinaryNode(arr[6]);
+    return root;
+}
+
+
+void insertTrie(TrieNode* root, int value) {
+    string valStr = to_string(abs(value));
+    TrieNode* current = root;
+    for (char c : valStr) {
+        int digit = c - '0';
+        if (!current->children[digit]) {
+            current->children[digit] = new TrieNode();
+        }
+        current = current->children[digit];
+    }
+    current->isEndOfValue = true;
+}
+
+
+void printTrieDFS(TrieNode* root, string currentPrefix) {
+    if (!root) return;
+    if (root->isEndOfValue) {
+        cout << currentPrefix << " ";
+    }
+    for (int i = 0; i < 10; i++) {
+        if (root->children[i]) {
+            printTrieDFS(root->children[i], currentPrefix + to_string(i));
+        }
+    }
+}
+
+// =================================================================
+// 4. MAIN USER TERMINAL CONTROL PANEL
+// =================================================================
+int main() {
+    int userArray[ARRAY_SIZE];
+    int menuChoice;
+
+    cout << "==================================================================\n";
+    cout << "  CS 104: TREE ARCHITECTURE SIMULATOR ENGINE \n";
+    cout << "==================================================================\n";
+    cout << "Please input exactly 10 spatial integer values:\n";
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        cout << "Element [" << (i + 1) << "] : ";
+        cin >> userArray[i];
+    }
+
+    do {
+        cout << "\n========================================================\n";
+        cout << "         TREE ARCHITECTURE SELECTOR          \n";
+        cout << "========================================================\n";
+        cout << "1. Run General Tree / N-ary Tree Representation\n";
+        cout << "2. Run Standard Binary Tree Representation\n";
+        cout << "3. Run Binary Search Tree (BST) Sorting Protocol\n";
+        cout << "4. Run Self-Balancing AVL Search Tree Protocol\n";
+        cout << "5. Run Complete Binary Tree / Max-Heap Array Map\n";
+        cout << "6. Run Full Binary Tree Enforcement Format\n";
+        cout << "7. Run Perfect Binary Tree Structural Map\n";
+        cout << "8. Run Trie (Prefix Tree) Character Base Digit Parse\n";
+        cout << "9. Exit Application\n";
+        cout << "========================================================\n";
+        cout << "Choose a tree model to construct: ";
+        cin >> menuChoice;
+
+        switch (menuChoice) {
+            case 1: {
+                cout << "\n[Building General N-ary Tree Node Mapping...]\n";
+                GeneralNode* gRoot = buildGeneralTree(userArray);
+                printGeneralTreeBFS(gRoot);
+                freeGeneralTree(gRoot);
+                break;
+            }
+            case 2: {
+                cout << "\n[Building Standard Complete Binary Iteration Node Map...]\n";
+                BinaryNode* bRoot = buildStandardBinaryTree(userArray, 0, ARRAY_SIZE);
+                cout << "Level-Order Traversal View: ";
+                printLevelOrder(bRoot);
+                freeBinaryTree(bRoot);
+                break;
+            }
+            case 3: {
+                cout << "\n[Executing Binary Search Tree Sequential Node Insertions...]\n";
+                BinaryNode* bstRoot = nullptr;
+                for (int i = 0; i < ARRAY_SIZE; i++) bstRoot = insertBST(bstRoot, userArray[i]);
+                cout << "In-Order Sorted Sequence Display : ";
+                printInOrder(bstRoot);
+                cout << "\nLevel-Order Structure View Representation: ";
+                printLevelOrder(bstRoot);
+                freeBinaryTree(bstRoot);
+                break;
+            }
+            case 4: {
+                cout << "\n[Executing Auto-Balancing AVL Insertion Rotations...]\n";
+                BinaryNode* avlRoot = nullptr;
+                for (int i = 0; i < ARRAY_SIZE; i++) avlRoot = insertAVL(avlRoot, userArray[i]);
+                cout << "In-Order Balanced Dataset Outputs : ";
+                printInOrder(avlRoot);
+                cout << "\nLevel-Order Balanced Heights Display: ";
+                printLevelOrder(avlRoot);
+                freeBinaryTree(avlRoot);
+                break;
+            }
+            case 5: {
+                cout << "\n[Executing Complete Binary Heapification Matrix Transformations...]\n";
+                int heapTemp[ARRAY_SIZE];
+                for (int i = 0; i < ARRAY_SIZE; i++) heapTemp[i] = userArray[i];
+                // Loop backward from last internal node to structure elements
+                for (int i = (ARRAY_SIZE / 2) - 1; i >= 0; i--) heapify(heapTemp, ARRAY_SIZE, i);
+
+                BinaryNode* heapRoot = buildStandardBinaryTree(heapTemp, 0, ARRAY_SIZE);
+                cout << "Complete Max-Heap Structure View: ";
+                printLevelOrder(heapRoot);
+                freeBinaryTree(heapRoot);
+                break;
+            }
+            case 6: {
+                cout << "\n[Evaluating Full Binary Array Subset Slices...]\n";
+                BinaryNode* fullRoot = buildFullBinaryTree(userArray);
+                cout << "Full Binary Tree Layout (Every parent has 0 or 2 children): ";
+                printLevelOrder(fullRoot);
+                freeBinaryTree(fullRoot);
+                break;
+            }
+            case 7: {
+                cout << "\n[Evaluating Perfect Binary Symmetrical Framework Components...]\n";
+                BinaryNode* perfRoot = buildPerfectBinaryTree(userArray);
+                cout << "Perfect Binary Tree Level View (7 complete node blocks): ";
+                printLevelOrder(perfRoot);
+                freeBinaryTree(perfRoot);
+                break;
+            }
+            case 8: {
+                cout << "\n[Building Key Segment Digital Digit Trie Trees...]\n";
+                TrieNode* trieRoot = new TrieNode();
+                for (int i = 0; i < ARRAY_SIZE; i++) insertTrie(trieRoot, userArray[i]);
+                cout << "Extracted parsed absolute values stored within Trie paths: ";
+                printTrieDFS(trieRoot, "");
+                cout << "\n";
+                freeTrie(trieRoot);
+                break;
+            }
+            case 9:
+                cout << "\nShutting down Tree Simulation Console Pipeline. Goodbye!\n";
+                break;
+            default:
+                cout << "\nInvalid choice selection parameter structural range! Try again.\n";
+        }
+    } while (menuChoice != 9);
+
+    return 0;
+}
